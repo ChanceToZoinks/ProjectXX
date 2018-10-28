@@ -20,11 +20,11 @@ def get_recommendation():
     #                                      {'id': 'id1', 'title': 'tit1', 'summary': 'sum1text'},
     #                                      ...
     #                                      {'id': 'id19', 'title': 'tit19', 'summary': 'sum19text'}
-    #                       'user': [{'id': 'id0', 'title': 'tit0', 'summary': 'sum0text', 'rating': '(0 or 1)'},
-    #                               {'id': 'id1', 'title': 'tit1', 'summary': 'sum1text', 'rating': '(0 or 1)'}
+    #                       'user': [{'id': 'id0', 'title': 'tit0', 'summary': 'sum0text', 'rating': '(1 or 2)'},
+    #                               {'id': 'id1', 'title': 'tit1', 'summary': 'sum1text', 'rating': '(1 or 2)'}
     #                               ...
-    #                               {'id': 'id24', 'title24': 'tit24', 'summary': 'sum24text', 'rating': '(0 or 1)'}]
-    #               Note: A rating of 0 indicates the user disliked the recipe. Rating of 1 is a like.
+    #                               {'id': 'id24', 'title24': 'tit24', 'summary': 'sum24text', 'rating': '(1 or 2)'}]
+    #               Note: A rating of 1 indicates the user disliked the recipe. Rating of 2 is a like.
     #       They must also include a header of this form:
     #               headers = {"Content-Type": "application/json"}
     if request.method == 'POST':

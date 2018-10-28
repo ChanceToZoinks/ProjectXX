@@ -1,6 +1,5 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request
 from recengine import ContentBasedFilter
-import json
 
 app = Flask(__name__)
 
@@ -31,7 +30,7 @@ def get_recommendation():
     if request.method == 'POST':
         content_filter = ContentBasedFilter.ContentBasedFilter(request.get_json())
         rec_json = content_filter.get_recommendation()
-        return '', 204
+        return rec_json, 200
     elif request.method == 'GET':
         return recipes
 

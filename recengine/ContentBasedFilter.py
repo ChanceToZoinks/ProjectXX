@@ -15,7 +15,7 @@ class ContentBasedFilter:
         self.userData = app_payload['user']
         self.stopwords_list = stopwords.words('english')
         self.vectorizer = TfidfVectorizer(analyzer='word',
-                            ngram_range=(1, 3),
+                            ngram_range=(1, 2),
                             min_df=0.003,
                             max_df=0.5,
                             max_features=1000,
@@ -26,21 +26,18 @@ class ContentBasedFilter:
         self.user_recipe_ids = []
         self.all_recipe_ids = []
         self.recipe_ratings = []
+        self.userprofile = ''
         self.__gib_user_profile()
 
     def __populate_lists(self):
         for recipe in self.userData:
-            self.concat_titles_summaries.append(recipe['summary'])
-            self.concat_titles_summaries.append(recipe['title'])
+            self.concat_titles_summaries.append(recipe['title'] + recipe['summary'])
             self.user_recipe_ids.append(recipe['id'])
             self.all_recipe_ids.append(recipe['id'])
             self.recipe_ratings.append(recipe['rating'])
         for recipe in self.generatedList:
-            self.concat_titles_summaries.append(recipe['summary'])
-            self.concat_titles_summaries.append(recipe['title'])
+            self.concat_titles_summaries.append(recipe['title'] + recipe['summary'])
             self.all_recipe_ids.append(recipe['id'])
-
-        print(self.concat_titles_summaries)
 
     def __generate_tf_idf(self):
         self.tfidf_matrix = self.vectorizer.fit_transform(self.concat_titles_summaries)
@@ -67,9 +64,29 @@ class ContentBasedFilter:
     def __gib_user_profile(self):
         self.__populate_lists()
         self.__generate_tf_idf()
-        myprofile = self.__build_users_profile()
-        print(myprofile.shape)
-        d = pd.DataFrame(sorted(zip(self.tfidf_feature_names, myprofile.flatten().tolist()),
-                                key=lambda x: -x[1])[:20],
-                         columns=['token', 'relevance'])
-        print(d)
+        self.userprofile = self.__build_users_profile()
+        # d = pd.DataFrame(sorted(zip(self.tfidf_feature_names, self.userprofile.flatten().tolist()),
+        #                        key=lambda x: -x[1])[:20],
+        #                 columns=['token', 'relevance'])
+
+    def __get_similar_recipes_to_user(self, topn=20):
+        cosine_similarities = cosine_similarity(self.userprofile, self.tfidf_matrix)
+
+        similar_indices = cosine_similarities.argsort().flatten()[-topn:]
+
+        similar_recipes = sorted([(self.all_recipe_ids[i], cosine_similarities[0, i]) for i in similar_indices],
+                                 key=lambda x: -x[1])
+        return similar_recipes
+
+    def __recommend_recipes(self, recipes_to_ignore=[], topn=5):
+        similar_recipes = self.__get_similar_recipes_to_user()
+        similar_recipes_filtered = list(filter(lambda x: x[0] not in recipes_to_ignore, similar_recipes))
+        # Debug stuff
+        rec_df = pd.DataFrame(similar_recipes_filtered, columns=['id', 'strength']).head(topn)
+        rec_df_json = rec_df.to_json(orient='records')
+        return rec_df_json
+
+    def get_recommendation(self):
+        message = self.__recommend_recipes(recipes_to_ignore=self.user_recipe_ids)
+
+        return message

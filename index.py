@@ -1,7 +1,11 @@
 from flask import Flask, request, jsonify
 from recengine import ContentBasedFilter
+import json
 
 app = Flask(__name__)
+
+
+recipes = []
 
 
 @app.route('/')
@@ -25,11 +29,11 @@ def get_recommendation():
     #       They must also include a header of this form:
     #               headers = {"Content-Type": "application/json"}
     if request.method == 'POST':
-        rec = ContentBasedFilter.ContentBasedFilter(request.get_json())
-        # print(rec)
+        content_filter = ContentBasedFilter.ContentBasedFilter(request.get_json())
+        rec_json = content_filter.get_recommendation()
         return '', 204
     elif request.method == 'GET':
-        return "This is a POST only endpoint"
+        return recipes
 
 
 if __name__ == '__main__':

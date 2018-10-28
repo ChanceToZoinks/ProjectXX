@@ -1,12 +1,10 @@
 import numpy as np
-import sklearn
 import scipy
 import pandas as pd
+import sklearn
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from scipy.sparse.linalg import svds
-import matplotlib.pyplot as plt
 
 
 class ContentBasedFilter:

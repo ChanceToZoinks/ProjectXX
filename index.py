@@ -4,13 +4,15 @@ from recengine import ContentBasedFilter
 app = Flask(__name__)
 
 
-recipes = []
-
-
 @app.route('/')
 def index():
     return 'the endpoint is /getrec view the docs for help'
 
+
+@app.route('/newuser', methods=['POST'])
+def get_user_id():
+    # put user id in database if not already there
+    pass
 
 @app.route('/getrec', methods=['GET', 'POST'])
 def get_recommendation():
